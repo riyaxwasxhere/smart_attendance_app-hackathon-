@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/teacher_routine/routine_item.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
-class TeacherClassTile extends StatelessWidget {
+class TeacherClassTile extends StatefulWidget {
   const TeacherClassTile({
     super.key,
     required this.index,
@@ -21,31 +21,40 @@ class TeacherClassTile extends StatelessWidget {
   final void Function(String section) onShowAttendance;
 
   @override
+  State<TeacherClassTile> createState() => _TeacherClassTileState();
+}
+
+class _TeacherClassTileState extends State<TeacherClassTile> {
+  bool ClassStarted = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return TimelineTile(
       alignment: TimelineAlign.manual,
       lineXY: 0.05,
-      isFirst: index == 0,
-      isLast: index == totalSesssions - 1,
+      isFirst: widget.index == 0,
+      isLast: widget.index == widget.totalSesssions - 1,
       indicatorStyle: IndicatorStyle(
-        width: current ? 18.0 : 15.0,
+        width: widget.current ? 18.0 : 15.0,
         color:
-            current
+            widget.current
                 ? const Color.fromARGB(255, 74, 222, 143)
-                : (ended
+                : (widget.ended
                     ? Colors.grey
                     : const Color.fromARGB(255, 183, 235, 230)),
       ),
-      beforeLineStyle: LineStyle(color: ended ? Colors.grey : Colors.teal),
+      beforeLineStyle: LineStyle(
+        color: widget.ended ? Colors.grey : Colors.teal,
+      ),
       endChild: Container(
         margin: const EdgeInsets.all(8.0),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ended ? Colors.grey.shade300 : Colors.white,
+          color: widget.ended ? Colors.grey.shade300 : Colors.white,
           border: Border.all(
-            color: current ? Colors.teal : Colors.grey,
-            width: current ? 2 : 1,
+            color: widget.current ? Colors.teal : Colors.grey,
+            width: widget.current ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -58,20 +67,22 @@ class TeacherClassTile extends StatelessWidget {
                 SizedBox(
                   width: 150,
                   child: Text(
-                    "${session.startTimeString} - ${session.endTimeString}",
+                    "${widget.session.startTimeString} - ${widget.session.endTimeString}",
                     style: TextStyle(
-                      fontWeight: current ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          widget.current ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    session.title,
+                    widget.session.title,
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: current ? FontWeight.bold : FontWeight.normal,
-                      color: ended ? Colors.grey : Colors.black,
+                      fontWeight:
+                          widget.current ? FontWeight.bold : FontWeight.normal,
+                      color: widget.ended ? Colors.grey : Colors.black,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -79,9 +90,33 @@ class TeacherClassTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text("class: ${session.section}", style: theme.textTheme.bodyLarge),
+            Text(
+              "class: ${widget.session.section}",
+              style: theme.textTheme.bodyLarge,
+            ),
             const SizedBox(height: 16),
-            if (current || ended)
+
+            //start class button
+            if (widget.current && !ClassStarted)
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  backgroundColor: const Color.fromARGB(255, 34, 119, 42),
+                  foregroundColor: theme.colorScheme.onPrimary,
+                ),
+                onPressed: () {
+                  setState(() {
+                    ClassStarted = true;
+                  });
+                },
+                child: const Text("Start class"),
+              ),
+
+            const SizedBox(height: 16),
+            //give attendance button
+            if (widget.current || widget.ended)
               ElevatedButton.icon(
                 icon: const Icon(Icons.people),
                 style: ElevatedButton.styleFrom(
@@ -92,14 +127,14 @@ class TeacherClassTile extends StatelessWidget {
                   foregroundColor: theme.colorScheme.onPrimary,
                 ),
                 onPressed:
-                    ended
+                    widget.ended || !ClassStarted
                         ? null
                         : () {
-                          onShowAttendance(session.section);
+                          widget.onShowAttendance(widget.session.section);
                         },
                 label: const Text("Give attendance"),
               ),
-            if (!ended && !current)
+            if (!widget.ended && !widget.current)
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -108,7 +143,9 @@ class TeacherClassTile extends StatelessWidget {
                   backgroundColor: theme.colorScheme.error.withAlpha(180),
                   foregroundColor: theme.colorScheme.onPrimary,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  // Cancel class logic (can be added later)
+                },
                 label: const Text("Cancel class"),
                 icon: const Icon(Icons.cancel),
               ),

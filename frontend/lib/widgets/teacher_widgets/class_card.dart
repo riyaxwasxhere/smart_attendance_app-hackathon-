@@ -12,7 +12,7 @@ class ClassCard extends StatelessWidget {
   final String subject;
   final String semester;
   final String section;
-  final void Function(String classItem) onSelectclassItem;
+  final void Function(String classItem, String className) onSelectclassItem;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class ClassCard extends StatelessWidget {
       splashColor: Theme.of(context).colorScheme.primaryContainer,
       borderRadius: BorderRadius.circular(5),
       onTap: () {
-        onSelectclassItem("$semester-$section");
+        onSelectclassItem(subject, "$semester-$section");
       },
       child: Card(
         child: Container(

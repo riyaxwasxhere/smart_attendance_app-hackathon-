@@ -15,12 +15,12 @@ class _ClassesListState extends State<ClassesList> {
 
   var _currentSem = 4;
 
-  void _selectClass(subject) {
+  void _selectClass(subject, className) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (ctx) {
-          return const ClassSummary();
+          return ClassSummary(subject: subject, className: className);
         },
       ),
     );

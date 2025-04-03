@@ -4,20 +4,27 @@ import 'package:frontend/widgets/teacher_widgets/attendance_weekly_chart.dart';
 import 'package:frontend/widgets/teacher_widgets/student_list.dart';
 
 class ClassSummary extends StatefulWidget {
-  const ClassSummary({super.key});
+  const ClassSummary({
+    super.key,
+    required this.subject,
+    required this.className,
+  });
+
+  final String subject;
+  final String className;
 
   @override
   State<ClassSummary> createState() => _ClassSummaryState();
 }
 
 class _ClassSummaryState extends State<ClassSummary> {
-  void showAllStudents() {
+  void showAllStudents(String subject) {
     showModalBottomSheet(
       isScrollControlled: true,
       useSafeArea: true,
       context: context,
       builder: (context) {
-        return const StudentList();
+        return StudentList(subject: subject);
       },
     );
   }
@@ -49,7 +56,9 @@ class _ClassSummaryState extends State<ClassSummary> {
             const SizedBox(height: 200, child: AttendanceWeeklyChart()),
             const SizedBox(height: 32),
             ElevatedButton.icon(
-              onPressed: showAllStudents,
+              onPressed: () {
+                showAllStudents(widget.subject);
+              },
               label: const Text(
                 "View Students",
                 style: TextStyle(fontSize: 16),

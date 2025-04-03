@@ -3,7 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:frontend/screens/student_screens/attendance_summary.dart';
 
 class StudentList extends StatefulWidget {
-  const StudentList({super.key});
+  const StudentList({super.key, required this.subject});
+
+  final String subject;
 
   @override
   State<StudentList> createState() => _StudentListState();
@@ -102,8 +104,9 @@ class _StudentListState extends State<StudentList> {
                               context,
                               MaterialPageRoute(
                                 builder:
-                                    (context) => AttendanceSummary(
+                                    (context) => AttendaceSummary(
                                       studentId: student["id"],
+                                      subjectName: widget.subject,
                                     ),
                               ),
                             );
