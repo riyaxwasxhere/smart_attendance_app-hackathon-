@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/widgets/teacher_widgets/attendance_pie_chart.dart';
 import 'package:frontend/widgets/teacher_widgets/attendance_weekly_chart.dart';
+import 'package:frontend/widgets/teacher_widgets/student_list.dart';
 
 class ClassSummary extends StatefulWidget {
   const ClassSummary({super.key});
@@ -10,6 +11,17 @@ class ClassSummary extends StatefulWidget {
 }
 
 class _ClassSummaryState extends State<ClassSummary> {
+  void showAllStudents() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      useSafeArea: true,
+      context: context,
+      builder: (context) {
+        return const StudentList();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -37,7 +49,7 @@ class _ClassSummaryState extends State<ClassSummary> {
             const SizedBox(height: 200, child: AttendanceWeeklyChart()),
             const SizedBox(height: 32),
             ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: showAllStudents,
               label: const Text(
                 "View Students",
                 style: TextStyle(fontSize: 16),
