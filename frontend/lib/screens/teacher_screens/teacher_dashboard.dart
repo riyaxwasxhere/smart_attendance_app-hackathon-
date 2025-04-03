@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 //teacher routine
 import 'package:frontend/models/teacher_routine/teacher_routine.dart';
-import 'package:frontend/widgets/teacher_class_tile.dart';
+import 'package:frontend/widgets/teacher_widgets/teacher_class_tile.dart';
 
 class TeacherDashboard extends StatefulWidget {
   const TeacherDashboard({super.key});
@@ -27,17 +27,6 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
         children: [
           Text("Hi! Teacher", style: theme.textTheme.titleLarge),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              debugPrint("pressed");
-            },
-            child: const Text("Get all geofences!"),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text("Push notification"),
-          ),
           Text(
             "Today's classes",
             style: theme.textTheme.bodyLarge!.copyWith(
@@ -53,10 +42,12 @@ class _TeacherDashboardState extends State<TeacherDashboard> {
                 final session = sessions[index];
                 final startTime = session.startTime;
                 final endTime = session.endTime;
+
                 bool ended = currentTime.isAfter(endTime);
                 bool current =
                     currentTime.isAfter(startTime) &&
                     currentTime.isBefore(endTime);
+
                 return TeacherClassTile(
                   onShowAttendance: showAttendanceModal,
                   session: session,

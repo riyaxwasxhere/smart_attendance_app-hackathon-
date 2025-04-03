@@ -37,15 +37,15 @@ class TeacherRoutine {
       RoutineItem(
         title: 'Python',
         section: '4-B',
-        startTimeString: '9:00 PM',
-        endTimeString: '10:00 PM',
+        startTimeString: '10:00 PM',
+        endTimeString: '11:00 PM',
       ),
       // Session 6: Upcoming
       RoutineItem(
         title: 'DBMS lab',
         section: '4-B',
         startTimeString: '11:00 PM',
-        endTimeString: '12:00 AM',
+        endTimeString: '11:30 PM',
       ),
     ];
   }

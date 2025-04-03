@@ -32,20 +32,21 @@ class TeacherClassTile extends StatelessWidget {
         width: current ? 18.0 : 15.0,
         color:
             current
-                ? Colors.teal
+                ? const Color.fromARGB(255, 74, 222, 143)
                 : (ended
                     ? Colors.grey
-                    : const Color.fromARGB(255, 134, 233, 223)),
+                    : const Color.fromARGB(255, 183, 235, 230)),
       ),
-      beforeLineStyle: LineStyle(
-        color: ended ? Colors.grey : const Color.fromARGB(255, 40, 89, 84),
-      ),
+      beforeLineStyle: LineStyle(color: ended ? Colors.grey : Colors.teal),
       endChild: Container(
         margin: const EdgeInsets.all(8.0),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: ended ? Colors.grey.shade300 : Colors.white,
-          border: Border.all(color: current ? Colors.teal : Colors.grey),
+          border: Border.all(
+            color: current ? Colors.teal : Colors.grey,
+            width: current ? 2 : 1,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
@@ -55,9 +56,9 @@ class TeacherClassTile extends StatelessWidget {
             Row(
               children: [
                 SizedBox(
-                  width: 100,
+                  width: 150,
                   child: Text(
-                    "${session.startTimeString} ${session.endTimeString}",
+                    "${session.startTimeString} - ${session.endTimeString}",
                     style: TextStyle(
                       fontWeight: current ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -72,6 +73,7 @@ class TeacherClassTile extends StatelessWidget {
                       fontWeight: current ? FontWeight.bold : FontWeight.normal,
                       color: ended ? Colors.grey : Colors.black,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
