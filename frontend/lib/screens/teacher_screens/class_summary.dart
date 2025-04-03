@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/teacher_widgets/attendance_pie_chart.dart';
+import 'package:frontend/widgets/teacher_widgets/attendance_weekly_chart.dart';
 
 class ClassSummary extends StatefulWidget {
   const ClassSummary({super.key});
@@ -10,6 +12,41 @@ class ClassSummary extends StatefulWidget {
 class _ClassSummaryState extends State<ClassSummary> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Class Summary"),
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+        child: Column(
+          children: [
+            Text("Total classes: 25", style: theme.textTheme.titleLarge),
+            const SizedBox(height: 32),
+            AttendancePieChart(presentCount: 40, absentCount: 20),
+            const SizedBox(height: 50),
+            Text(
+              "Last 7 days attendance",
+              style: theme.textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 30),
+            const SizedBox(height: 200, child: AttendanceWeeklyChart()),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () {},
+              label: const Text(
+                "View Students",
+                style: TextStyle(fontSize: 16),
+              ),
+              icon: const Icon(Icons.people),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/assigned_classes/assigned_class.dart';
 import 'package:frontend/models/assigned_classes/assigned_classes.dart';
 import 'package:frontend/screens/teacher_screens/class_summary.dart';
 import 'package:frontend/widgets/teacher_widgets/class_card.dart';
@@ -36,7 +35,7 @@ class _ClassesListState extends State<ClassesList> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
