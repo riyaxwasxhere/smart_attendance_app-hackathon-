@@ -7,12 +7,14 @@ class RoutineItem {
   final String endTimeString;
   late DateTime startTime;
   late DateTime endTime;
+  final String dept;
 
   RoutineItem({
     required this.title,
     required this.section,
     required this.startTimeString,
     required this.endTimeString,
+    required this.dept,
   }) {
     startTime = _convertToDateTime(startTimeString);
     endTime = _convertToDateTime(endTimeString);

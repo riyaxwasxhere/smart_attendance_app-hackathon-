@@ -4,7 +4,6 @@ import 'package:frontend/widgets/teacher_widgets/attendance_tile.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key, required this.section});
-
   final String section;
 
   @override
@@ -12,32 +11,38 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
-  Future<List<Map<String, dynamic>>> getAllStudents(section) async {
+  List<Map<String, dynamic>> students = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStudents(widget.section);
+  }
+
+  Future<void> fetchStudents(String section) async {
     final studentsSnapshot =
         await FirebaseFirestore.instance
             .collection("students")
             .where('class', isEqualTo: section)
             .get();
-    return studentsSnapshot.docs.map((doc) => doc.data()).toList();
+
+    setState(() {
+      students =
+          studentsSnapshot.docs.map((doc) {
+            final data = doc.data();
+            data['is_present'] = false; // Initialize attendance
+            return data;
+          }).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return FutureBuilder(
-      future: getAllStudents(widget.section),
-      builder: (ctx, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text("No students found"));
-        }
 
-        final students = snapshot.data!;
-
-        return Padding(
+    return students.isEmpty
+        ? const Center(child: CircularProgressIndicator())
+        : Padding(
           padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
           child: Column(
             children: [
@@ -54,6 +59,20 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 ],
               ),
               const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    for (var student in students) {
+                      if (student['is_in_class'] == true) {
+                        student['is_present'] = true;
+                      }
+                    }
+                  });
+                },
+                label: const Text("Auto Attendance"),
+                icon: const Icon(Icons.refresh),
+              ),
+              const SizedBox(height: 16),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -61,17 +80,27 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     itemCount: students.length,
                     itemBuilder: (ctx, index) {
                       final student = students[index];
-                      return AttendanceTile(student: student);
+                      return AttendanceTile(
+                        student: student,
+                        isPresent: student['is_present'],
+                        onChanged: (val) {
+                          setState(() {
+                            students[index]['is_present'] = val;
+                          });
+                        },
+                      );
                     },
                   ),
                 ),
               ),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Submit attendance logic here
+                      Navigator.pop(context);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: theme.colorScheme.onPrimary,
@@ -94,7 +123,5 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ],
           ),
         );
-      },
-    );
   }
 }
