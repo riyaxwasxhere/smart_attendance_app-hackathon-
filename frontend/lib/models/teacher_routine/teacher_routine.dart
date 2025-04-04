@@ -8,21 +8,21 @@ class TeacherRoutine {
       // Session 1: Ended
       RoutineItem(
         title: 'DBMS',
-        section: '4-B',
+        section: '1-B',
         startTimeString: '3:00 AM',
         endTimeString: '4:00 AM',
       ),
       // Session 2: Ended
       RoutineItem(
         title: 'Operating System',
-        section: '4-B',
+        section: '1-B',
         startTimeString: '4:00 AM',
         endTimeString: '6:00 AM',
       ),
       // Session 3: Just ended
       RoutineItem(
         title: 'Human Resource',
-        section: '4-B',
+        section: '1-B',
         startTimeString: '6:00 AM',
         endTimeString: '7:00 AM',
       ),

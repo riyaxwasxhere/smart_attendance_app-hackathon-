@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 //teacher routine
 import 'package:frontend/models/teacher_routine/teacher_routine.dart';
+import 'package:frontend/screens/teacher_screens/attendance_screen.dart';
+
 import 'package:frontend/widgets/teacher_widgets/teacher_class_tile.dart';
 
 class TeacherDashboard extends StatefulWidget {
@@ -11,7 +13,16 @@ class TeacherDashboard extends StatefulWidget {
 }
 
 class _TeacherDashboardState extends State<TeacherDashboard> {
-  showAttendanceModal(String str) {}
+  showAttendanceModal(String section) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      useSafeArea: true,
+      context: context,
+      builder: (context) {
+        return AttendanceScreen(section: section);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

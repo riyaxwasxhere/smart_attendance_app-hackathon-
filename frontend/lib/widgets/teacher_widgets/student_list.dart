@@ -125,20 +125,3 @@ class _StudentListState extends State<StudentList> {
     );
   }
 }
-
-// Placeholder Attendance Screen
-class AttendanceScreen extends StatelessWidget {
-  final String studentId;
-
-  AttendanceScreen({required this.studentId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Attendance Details")),
-      body: Center(
-        child: Text("Attendance details for Student ID: $studentId"),
-      ),
-    );
-  }
-}

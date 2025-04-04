@@ -25,7 +25,7 @@ class TeacherClassTile extends StatefulWidget {
 }
 
 class _TeacherClassTileState extends State<TeacherClassTile> {
-  bool ClassStarted = false;
+  bool classStarted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +97,7 @@ class _TeacherClassTileState extends State<TeacherClassTile> {
             const SizedBox(height: 16),
 
             //start class button
-            if (widget.current && !ClassStarted)
+            if (widget.current && !classStarted)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -108,7 +108,7 @@ class _TeacherClassTileState extends State<TeacherClassTile> {
                 ),
                 onPressed: () {
                   setState(() {
-                    ClassStarted = true;
+                    classStarted = true;
                   });
                 },
                 child: const Text("Start class"),
@@ -127,7 +127,7 @@ class _TeacherClassTileState extends State<TeacherClassTile> {
                   foregroundColor: theme.colorScheme.onPrimary,
                 ),
                 onPressed:
-                    widget.ended || !ClassStarted
+                    widget.ended || !classStarted
                         ? null
                         : () {
                           widget.onShowAttendance(widget.session.section);
