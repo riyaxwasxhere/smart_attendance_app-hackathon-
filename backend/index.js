@@ -24,13 +24,13 @@ app.use("/api/attendance", attendanceRoutes);
 
 
 mongoose
-  .connect(process.env.DBURL, {
+  .connect("mongodb+srv://Rajdeepcr7:Rajdeepcr7@cluster0.ylidhnx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
     console.log("Connected to Database");
-    server.listen(PORT, () => console.log(`Server started at PORT: ${PORT}`));
+    server.listen(8000, () => console.log(`Server started at PORT: ${PORT}`));
   })
   .catch((err) => {
     console.log("Connection failed", err);
