@@ -9,6 +9,27 @@ const Teacher = require('../models/teacherSchema')
 
 const router = express.Router()
 
+router.post('/signUp', async (req,res)=>{
+    const {name, email, password} = req.body
+    try{
+        const existingTeacher = await Teacher.findOne({email})
+        if(existingTeacher){
+            return res.status(200).json({message: "Email registered."})
+        }
+        const saltRounds = 10
+        const hashedPassword = await bcrypt.hash(password,saltRounds)
+        const newTeacher  = new Teacher({
+            name,
+            email,
+            password: hashedPassword
+        })
+        await newTeacher.save()
+        return res.status(201).json({message: "Teacher registered successfully."})
+    }catch(error){
+        return res.status(500).json({message: "Server Error",error})
+    }
+})
+
 router.post('/login', async (req,res) => {
     const {email,password} = req.body
     try{
