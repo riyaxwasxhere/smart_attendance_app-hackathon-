@@ -14,8 +14,7 @@ class AttendanceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firstName = student['student_firstname'];
-    final lastName = student['student_lastname'];
+    final name = student['name'];
     final roll = student['roll'].toString();
     final isInClass = student['is_in_class'];
 
@@ -35,10 +34,7 @@ class AttendanceTile extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(width: 16),
-                  Text(
-                    "$firstName $lastName",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+                  Text("$name", style: Theme.of(context).textTheme.bodyLarge),
                 ],
               ),
               Checkbox(

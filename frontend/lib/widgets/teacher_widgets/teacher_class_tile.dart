@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/teacher_routine/routine_item.dart';
-import 'package:frontend/push_notification_service.dart';
+import 'package:frontend/utility/push_notification_service.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import 'package:frontend/utility/geofencing.dart';
 
@@ -109,13 +109,13 @@ class _TeacherClassTileState extends State<TeacherClassTile> {
                   foregroundColor: theme.colorScheme.onPrimary,
                 ),
                 onPressed: () async {
-                  List<String> tokens = await getStudentTokens(
-                    widget.session.dept,
-                    widget.session.section,
-                  );
-                  PushNotificationService.sendNotificationToSelectedStudents(
-                    tokens,
-                  );
+                  // List<String> tokens = await getStudentTokens(
+                  //   widget.session.dept,
+                  //   widget.session.section,
+                  // );
+                  // PushNotificationService.sendNotificationToSelectedStudents(
+                  //   tokens,
+                  // );
                   setState(() {
                     classStarted = true;
                   });

@@ -11,7 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 //for notification
-import 'package:frontend/noti_service.dart';
+import 'package:frontend/utility/noti_service.dart';
 
 final kcolorScheme = ColorScheme.fromSeed(seedColor: Colors.blue);
 NotiService notiService = NotiService();
@@ -58,7 +58,7 @@ void main() async {
           // centerTitle: true,
         ),
       ),
-      home: screen,
+      home: const Layout(currentUser: UserRole.admin),
     ),
   );
 }

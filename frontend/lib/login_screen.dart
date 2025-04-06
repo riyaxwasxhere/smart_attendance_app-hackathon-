@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:frontend/utility/geofencing.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
 
 Geofencing geofencing = Geofencing();
 
@@ -35,6 +36,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorText;
 
   Future<void> _validateAndLogin() async {
+    var email = _emailController.text;
+    var password = _passwordController.text;
+
     try {
       //if form not valid then return
       if (!(_formKey.currentState!.validate())) return;
@@ -43,107 +47,28 @@ class _LoginScreenState extends State<LoginScreen> {
       if (_userRole == UserRole.admin &&
           _emailController.text == 'admin@gmail.com' &&
           _passwordController.text == 'admin123') {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("user_role", _userRole.name);
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext ctx) {
-              return Layout(currentUser: _userRole);
-            },
-          ),
-        );
+        await addToSharedPreference({}, _userRole);
+        navigateToDashboard(_userRole);
         return;
       }
 
       //get the user details and validate
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance
-              .collection("${_userRole.name}s")
-              .where('email', isEqualTo: _emailController.text)
-              .get();
+      var user = await authenticateUser(email, password, _userRole);
+      if (user.isEmpty) return;
 
-      if (querySnapshot.docs.isEmpty) {
-        setState(() {
-          _errorText = "Email not registered!";
-        });
-        return;
-      }
-
-      final user = querySnapshot.docs.first;
-
-      if (user['password'] != _passwordController.text) {
-        setState(() {
-          _errorText = "Incorrect password!";
-        });
-        return;
-      }
-
-      //remove previous geofences
-      geofencing.removeAllGeofences();
-
-      //create geofence if student
-      if (_userRole == UserRole.student) {
-        querySnapshot =
-            await FirebaseFirestore.instance
-                .collection("geolocations")
-                .where('dept', isEqualTo: user['dept'])
-                .where('class', isEqualTo: user['class'])
-                .get();
-        if (querySnapshot.docs.isNotEmpty) {
-          GeoPoint coords = querySnapshot.docs.first.get('coords');
-          geofencing.createGeofence(coords, user['dept'], user['class']);
-          //save FCM token
-          saveFCMToken(user.id);
-        } else {
-          throw Exception(
-            "No geolocation found for the class ${user['class']} of dept ${user['dept']}",
-          );
-        }
-      }
-
-      //create geofences if teacher
-      if (_userRole == UserRole.teacher) {
-        for (final assignedClass in user['assigned_classes']) {
-          querySnapshot =
-              await FirebaseFirestore.instance
-                  .collection("geolocations")
-                  .where('dept', isEqualTo: assignedClass['dept'])
-                  .where('class', isEqualTo: assignedClass['class'])
-                  .get();
-
-          if (querySnapshot.docs.isNotEmpty) {
-            GeoPoint coords = querySnapshot.docs.first.get('coords');
-            geofencing.createGeofence(
-              coords,
-              assignedClass['dept'],
-              assignedClass['class'],
-            );
-          } else {
-            throw Exception(
-              "No geolocation found for the class ${assignedClass['class']} of dept ${assignedClass['dept']}",
-            );
-          }
-        }
-      }
+      //create geofence
+      await createGeofencesForUser(user, _userRole);
 
       //add to sharedpreference
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("user_role", _userRole.name);
-      await prefs.setString("user_details", jsonEncode(user.data()));
+      await addToSharedPreference(user, _userRole);
+
+      //add FCM token if student
+      if (_userRole == UserRole.student) {
+        await saveFCMToken(user['_id']);
+      }
 
       //go to dashboard
-      if (!mounted) return;
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext ctx) {
-            return Layout(currentUser: _userRole);
-          },
-        ),
-      );
+      navigateToDashboard(_userRole);
     } catch (e) {
       print("Error happened: $e");
       print("Stack Trace: $StackTrace");
@@ -151,6 +76,75 @@ class _LoginScreenState extends State<LoginScreen> {
         _errorText = "An error occured please try again!";
       });
     }
+  }
+
+  void navigateToDashboard(UserRole role) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext ctx) {
+          return Layout(currentUser: role);
+        },
+      ),
+    );
+  }
+
+  Future<void> addToSharedPreference(Map<String, dynamic> user, role) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("user_role", role.name);
+    await prefs.setString("user_details", jsonEncode(user));
+  }
+
+  Future<void> createGeofencesForUser(
+    Map<String, dynamic> user,
+    UserRole role,
+  ) async {
+    //remove previous geofences
+    geofencing.removeAllGeofences();
+    if (role == UserRole.student) {
+      print("created geofences for student");
+    } else {
+      print("created geofences for teachers");
+    }
+  }
+
+  Future<Map<String, dynamic>> authenticateUser(
+    String email,
+    String password,
+    UserRole role,
+  ) async {
+    var teacherUrl = "https://hv25-t05-code-ninjas.onrender.com/api/auth/login";
+    var studentUrl =
+        "https://hv25-t05-code-ninjas.onrender.com/api/students/login";
+    String reqUrl;
+
+    if (role == UserRole.teacher) {
+      reqUrl = teacherUrl;
+    } else {
+      reqUrl = studentUrl;
+    }
+
+    var response = await http.post(
+      Uri.parse(reqUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+
+    var data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      if (role == UserRole.teacher) {
+        return data.existingTeacher;
+      } else {
+        return data.user;
+      }
+    }
+
+    setState(() {
+      _errorText = data.message;
+    });
+
+    return {};
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/admin_screens/add_teachers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/screens/admin_screens/add_classrooms.dart';
 import 'package:frontend/screens/admin_screens/add_students.dart';
@@ -39,14 +40,19 @@ final List<Map<String, dynamic>> _teacherScreens = [
 
 final List<Map<String, dynamic>> _adminScreens = [
   {
-    'widget': const AddClassrooms(),
-    'title': 'Add classroom',
-    'icon': const Icon(Icons.home),
-  },
-  {
     'widget': const AddStudents(),
     'title': 'Add Students',
     'icon': const Icon(Icons.people),
+  },
+  {
+    'widget': const AddTeachers(),
+    'title': 'Add Teachers',
+    'icon': const Icon(Icons.school),
+  },
+  {
+    'widget': const AddClassrooms(),
+    'title': 'Add classroom',
+    'icon': const Icon(Icons.meeting_room),
   },
 ];
 

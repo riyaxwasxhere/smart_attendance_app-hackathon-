@@ -48,9 +48,9 @@ class TeacherRoutine {
       // Session 6: Upcoming
       RoutineItem(
         title: 'DBMS lab',
-        section: '4-B',
-        startTimeString: '6:00 PM',
-        endTimeString: '6:30 PM',
+        section: '1-B',
+        startTimeString: '8:00 PM',
+        endTimeString: '10:30 PM',
         dept: "BCA",
       ),
     ];

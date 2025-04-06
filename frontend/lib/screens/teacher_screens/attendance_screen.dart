@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:frontend/widgets/teacher_widgets/attendance_tile.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key, required this.section});
@@ -11,7 +12,7 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
-  List<Map<String, dynamic>> students = [];
+  List<dynamic> students = [];
 
   @override
   void initState() {
@@ -20,20 +21,24 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> fetchStudents(String section) async {
-    final studentsSnapshot =
-        await FirebaseFirestore.instance
-            .collection("students")
-            .where('class', isEqualTo: section)
-            .get();
+    var url = Uri.parse(
+      "https://hv25-t05-code-ninjas.onrender.com/api/students/BCA/$section",
+    );
 
-    setState(() {
-      students =
-          studentsSnapshot.docs.map((doc) {
-            final data = doc.data();
-            data['is_present'] = false; // Initialize attendance
-            return data;
-          }).toList();
-    });
+    var res = await http.get(url);
+
+    if (res.statusCode == 200) {
+      var data = jsonDecode(res.body);
+
+      for (final student in data) {
+        student['is_present'] = false;
+      }
+
+      students = data;
+      print(data);
+    } else {
+      print("some error occured");
+    }
   }
 
   @override

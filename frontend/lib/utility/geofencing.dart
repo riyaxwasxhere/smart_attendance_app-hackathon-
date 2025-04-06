@@ -6,9 +6,7 @@ import 'package:geolocator/geolocator.dart';
 
 @pragma('vm:entry-point')
 Future<void> geofenceTriggered(GeofenceCallbackParams params) async {
-  NativeGeofenceBackgroundManager.instance.promoteToForeground();
-
-  NativeGeofenceBackgroundManager.instance.demoteToBackground();
+  print(params.event);
 }
 
 Future<List<String>> getStudentTokens(String dept, String className) async {
