@@ -45,4 +45,20 @@ router.post("/", async (req, res) => {
   }
 });
 
+// To delete geospatial coordinates
+router.delete("/:dept/:className", async (req, res) => {
+  try {
+    const { dept, className } = req.params;
+    const geofenceData = await geofencing.find({ dept, className });
+    console.log(geofenceData);
+    await geofencing.findByIdAndDelete(geofenceData[0]._id);
+    if (!geofenceData) {
+      res.status(404).json({ error: error.message });
+    }
+    res.status(200).json("Deleted successfully");
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
