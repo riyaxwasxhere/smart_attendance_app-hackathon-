@@ -16,7 +16,19 @@ const teacherSchema = mongoose.Schema({
     role:{
         type: String,
         default: 'Teacher'
-    }
+    },
+    assignedClasses:[
+        {
+            dept: {
+                type: String,
+                required: true
+            },
+            class: {
+                type: String,
+                required: true
+            }
+        }
+    ]
 })
 
 const Teacher = mongoose.model("Teacher", teacherSchema)
