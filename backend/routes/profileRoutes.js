@@ -4,6 +4,17 @@ const router = express.Router()
 
 const Teacher = require('../models/teacherSchema')
 
+//gets all teacher profiles
+router.get('/teachers', async(req,res)=>{
+    try{
+        const teachers = await Teacher.find()
+        return res.json(teachers)
+    }catch(error){
+        return res.json(error.message)
+    }
+})
+
+//gets specific teacher by id
 router.get('/:teacherId', async(req,res)=>{
     try{
         const teacher = await Teacher.findById(req.params.teacherId)
