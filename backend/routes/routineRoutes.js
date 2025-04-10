@@ -86,5 +86,24 @@ router.delete('/:teacherId/:day', async (req, res)=>{
     }
 })
 
+// Get all routines for a specific semester, section, and day
+router.get('/filter/by-class', async (req, res) => {
+    const { semester, section, day } = req.query;
+
+    if (!semester || !section || !day) {
+        return res.status(400).json({ message: "semester, section, and day are required" });
+    }
+
+    try {
+        const routines = await Routine.find({ semester, section, day });
+        if (!routines.length) {
+            return res.status(404).json({ message: "No routines found for the given class and day" });
+        }
+        return res.status(200).json({ routines });
+    } catch (error) {
+        return res.status(500).json({ message: "Server error", error });
+    }
+});
+
 
 module.exports = router
