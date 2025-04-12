@@ -2,6 +2,17 @@ const express = require("express");
 const router = express.Router();
 const attendance = require("../models/attendanceSchema.js");
 
+
+// To get all attendances
+router.get("/", async (req, res) => {
+  try {
+    const allAttendances = await attendance.find();
+    res.status(200).json(allAttendances);
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+});
+
 // To get particular attendance of a student for today-working
 router.get("/:subject/:studentRoll/today", async (req, res) => {
   try {
