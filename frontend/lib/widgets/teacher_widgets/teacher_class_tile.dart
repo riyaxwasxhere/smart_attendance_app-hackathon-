@@ -20,7 +20,7 @@ class TeacherClassTile extends StatefulWidget {
   final RoutineItem session;
   final bool current;
   final bool ended;
-  final void Function(String section) onShowAttendance;
+  final void Function(String section, String subject) onShowAttendance;
 
   @override
   State<TeacherClassTile> createState() => _TeacherClassTileState();
@@ -139,7 +139,10 @@ class _TeacherClassTileState extends State<TeacherClassTile> {
                     widget.ended || !classStarted
                         ? null
                         : () {
-                          widget.onShowAttendance(widget.session.section);
+                          widget.onShowAttendance(
+                            widget.session.section,
+                            widget.session.title,
+                          );
                         },
                 label: const Text("Give attendance"),
               ),

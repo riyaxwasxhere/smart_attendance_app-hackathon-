@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user.isEmpty) return;
 
       //create geofence
-      await createGeofencesForUser(user, _userRole);
+      // await createGeofencesForUser(user, _userRole);
 
       //add to sharedpreference
       await addToSharedPreference(user, _userRole);
@@ -89,7 +89,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> addToSharedPreference(Map<String, dynamic> user, role) async {
+  Future<void> addToSharedPreference(
+    Map<String, dynamic> user,
+    UserRole role,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("user_role", role.name);
     await prefs.setString("user_details", jsonEncode(user));
@@ -113,9 +116,10 @@ class _LoginScreenState extends State<LoginScreen> {
     String password,
     UserRole role,
   ) async {
-    var teacherUrl = "https://hv25-t05-code-ninjas.onrender.com/api/auth/login";
+    var teacherUrl =
+        "https://smart-attendance-app-hackathon.onrender.com/api/auth/login";
     var studentUrl =
-        "https://hv25-t05-code-ninjas.onrender.com/api/students/login";
+        "https://smart-attendance-app-hackathon.onrender.com/api/students/login";
     String reqUrl;
 
     if (role == UserRole.teacher) {
@@ -134,9 +138,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (response.statusCode == 200) {
       if (role == UserRole.teacher) {
-        return data.existingTeacher;
+        return data["existingTeacher"];
       } else {
-        return data.user;
+        print(data);
+        return data['user'];
       }
     }
 

@@ -52,8 +52,12 @@ class _AddStudentsState extends State<AddStudents> {
     var className = "$_selectedSemester-${_sectionController.text}";
 
     var url = Uri.parse(
-      "https://hv25-t05-code-ninjas.onrender.com/api/students/signup",
+      "https://smart-attendance-app-hackathon.onrender.com/api/students/signup",
     );
+
+    if (!mounted) return;
+    FocusScope.of(context).unfocus();
+
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -83,9 +87,6 @@ class _AddStudentsState extends State<AddStudents> {
 
       _selectedDepartment = "BCA";
       _selectedSemester = "4";
-
-      if (!mounted) return;
-      FocusScope.of(context).unfocus();
 
       showSnackBar();
     } else {

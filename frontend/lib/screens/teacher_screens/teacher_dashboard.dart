@@ -13,13 +13,13 @@ class TeacherDashboard extends StatefulWidget {
 }
 
 class _TeacherDashboardState extends State<TeacherDashboard> {
-  showAttendanceModal(String section) {
+  showAttendanceModal(String section, String subject) {
     showModalBottomSheet(
       isScrollControlled: true,
       useSafeArea: true,
       context: context,
       builder: (context) {
-        return AttendanceScreen(section: section);
+        return AttendanceScreen(section: section, subject: subject);
       },
     );
   }

@@ -9,7 +9,7 @@ class AttendanceTile extends StatelessWidget {
   });
 
   final Map<String, dynamic> student;
-  final bool isPresent;
+  final bool? isPresent;
   final void Function(bool?) onChanged;
 
   @override
@@ -19,7 +19,8 @@ class AttendanceTile extends StatelessWidget {
     final isInClass = student['is_in_class'];
 
     return Opacity(
-      opacity: isInClass ? 1.0 : 0.5,
+      // opacity: isInClass ? 1.0 : 0.5,
+      opacity: 1.0,
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8),
         child: Container(
@@ -29,17 +30,54 @@ class AttendanceTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(
-                    "${roll.substring(roll.length - 3)}",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+                  Text(roll, style: Theme.of(context).textTheme.bodyLarge),
                   const SizedBox(width: 16),
                   Text("$name", style: Theme.of(context).textTheme.bodyLarge),
                 ],
               ),
-              Checkbox(
-                value: isPresent,
-                onChanged: isInClass ? onChanged : null,
+
+              // Checkbox(
+              //   value: isPresent,
+              //   onChanged: isInClass ? onChanged : null,
+              // ),
+              Row(
+                children: [
+                  ChoiceChip(
+                    label: const Text('P'),
+                    selected: isPresent == true,
+                    selectedColor: Colors.green,
+                    showCheckmark: false,
+                    shape: const CircleBorder(),
+                    onSelected:
+                        !isInClass
+                            ? (_) {
+                              onChanged(true);
+                            }
+                            : null,
+                    labelStyle: TextStyle(
+                      color: isPresent == true ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  ChoiceChip(
+                    label: const Text('A'),
+                    selected: isPresent == false,
+                    selectedColor: Colors.red,
+                    showCheckmark: false,
+                    shape: const CircleBorder(),
+                    onSelected:
+                        !isInClass
+                            ? (_) {
+                              onChanged(false);
+                            }
+                            : null,
+                    labelStyle: TextStyle(
+                      color: isPresent == false ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

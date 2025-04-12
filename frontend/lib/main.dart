@@ -21,7 +21,7 @@ void main() async {
   //firebase initialization
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  //get all necesaary permissions
+  // get all necesaary permissions
   await _requestPermissions();
 
   //setup geolocation
@@ -58,7 +58,7 @@ void main() async {
           // centerTitle: true,
         ),
       ),
-      home: const Layout(currentUser: UserRole.admin),
+      home: screen,
     ),
   );
 }

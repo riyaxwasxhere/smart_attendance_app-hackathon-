@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:frontend/widgets/teacher_widgets/attendance_tile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:frontend/utility/show_snackbar.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  const AttendanceScreen({super.key, required this.section});
+  const AttendanceScreen({
+    super.key,
+    required this.section,
+    required this.subject,
+  });
   final String section;
+  final String subject;
 
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
@@ -13,6 +19,7 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   List<dynamic> students = [];
+  bool isSubmitting = false;
 
   @override
   void initState() {
@@ -22,7 +29,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   Future<void> fetchStudents(String section) async {
     var url = Uri.parse(
-      "https://hv25-t05-code-ninjas.onrender.com/api/students/BCA/$section",
+      "https://smart-attendance-app-hackathon.onrender.com/api/students/BCA/4-B",
     );
 
     var res = await http.get(url);
@@ -31,21 +38,69 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       var data = jsonDecode(res.body);
 
       for (final student in data) {
-        student['is_present'] = false;
+        student['is_present'] = null;
       }
 
       students = data;
-      print(data);
+      setState(() {});
     } else {
       print("some error occured");
     }
+  }
+
+  Future<void> submitAttendance() async {
+    setState(() {
+      isSubmitting = true;
+    });
+
+    var url = Uri.parse(
+      "https://smart-attendance-app-hackathon.onrender.com/api/attendance",
+    );
+
+    List<Future<http.Response>> futures = [];
+
+    for (final student in students) {
+      futures.add(
+        http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'studentName': student['name'],
+            'studentRoll': student['roll'],
+            'dept': student['dept'],
+            'className': student['className'],
+            'subject': widget.subject,
+            'isPresent': student['isPresent'] ?? false,
+          }),
+        ),
+      );
+    }
+
+    final responses = await Future.wait(futures);
+
+    // Check if all responses were successful
+    final allSuccessful = responses.every((res) => res.statusCode == 201);
+
+    if (!mounted) return;
+
+    if (allSuccessful) {
+      showSuccessSnackBar(
+        context,
+        "Attendance submitted successfully for all students!",
+      );
+      Navigator.pop(context);
+    }
+
+    setState(() {
+      isSubmitting = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return students.isEmpty
+    return students.isEmpty || isSubmitting
         ? const Center(child: CircularProgressIndicator())
         : Padding(
           padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
@@ -64,20 +119,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  setState(() {
-                    for (var student in students) {
-                      if (student['is_in_class'] == true) {
-                        student['is_present'] = true;
-                      }
-                    }
-                  });
-                },
-                label: const Text("Auto Attendance"),
-                icon: const Icon(Icons.refresh),
-              ),
-              const SizedBox(height: 16),
+
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -102,10 +144,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      // Submit attendance logic here
-                      Navigator.pop(context);
-                    },
+                    onPressed: submitAttendance,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: theme.colorScheme.onPrimary,

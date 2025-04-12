@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:frontend/screens/student_screens/attendance_summary.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class StudentList extends StatefulWidget {
   const StudentList({super.key, required this.subject});
@@ -12,43 +13,36 @@ class StudentList extends StatefulWidget {
 }
 
 class _StudentListState extends State<StudentList> {
-  late Future<List<Map<String, dynamic>>> _studentsFuture;
+  late Future<List<dynamic>> _studentsFuture;
 
   @override
   void initState() {
     super.initState();
-    _studentsFuture = fetchStudents();
+    _studentsFuture = fetchStudents(); // properly assign the future
   }
 
-  // Function to fetch students from Firestore
-  Future<List<Map<String, dynamic>>> fetchStudents() async {
-    try {
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('students').get();
+  Future<List<dynamic>> fetchStudents() async {
+    final url = Uri.parse(
+      "https://smart-attendance-app-hackathon.onrender.com/api/students/BCA/4-B",
+    );
 
-      return snapshot.docs.map((doc) {
-        return {
-          "name": doc["student_firstname"],
-          "rollNumber": doc["roll"],
-          "id": doc.id, // Store document ID for reference
-        };
-      }).toList();
-    } catch (e) {
-      print("Error fetching students: $e");
-      return [];
+    final res = await http.get(url);
+
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body); // Return the decoded list of students
+    } else {
+      throw Exception('Failed to load students');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return FutureBuilder<List<Map<String, dynamic>>>(
+    return FutureBuilder<List<dynamic>>(
       future: _studentsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          ); // Loading spinner
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
@@ -97,7 +91,7 @@ class _StudentListState extends State<StudentList> {
                       ),
                       child: ListTile(
                         title: Text(student["name"]),
-                        subtitle: Text("Roll No: ${student["rollNumber"]}"),
+                        subtitle: Text("Roll No: ${student["roll"]}"),
                         trailing: ElevatedButton(
                           onPressed: () {
                             Navigator.push(

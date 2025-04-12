@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/admin_screens/add_routine.dart';
 import 'package:frontend/screens/admin_screens/add_teachers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend/screens/admin_screens/add_classrooms.dart';
@@ -53,6 +54,11 @@ final List<Map<String, dynamic>> _adminScreens = [
     'widget': const AddClassrooms(),
     'title': 'Add classroom',
     'icon': const Icon(Icons.meeting_room),
+  },
+  {
+    'widget': const AddRoutine(),
+    'title': 'Add Routine',
+    'icon': const Icon(Icons.calendar_month_rounded),
   },
 ];
 
@@ -119,6 +125,7 @@ class _LayoutState extends State<Layout> {
       ),
       body: currentScreen['widget'],
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: [
           for (final screen in _activeScreens)
             BottomNavigationBarItem(
