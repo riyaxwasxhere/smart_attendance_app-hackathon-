@@ -1,22 +1,29 @@
 const express = require('express')
 const mongoose = require('mongoose')
 
-const Routine = require('../models/routineSchema')
-// const verifyToken = require('../middleware/verifyToken')
-// const { verify } = require('jsonwebtoken')
+const Routine = require('../models/sessionSchema')
+const Session = require('../models/sessionSchema')
 
 const router = express.Router()
 
-//gets whole week rotuine
-router.get('/:teacherId/week', async (req,res)=>{
+//sets routine status by id and update lastUPdated automatically
+router.patch("/:routineId", async (req,res)=>{
     try{
-        const routines = await Routine.find({ teacherId: req.params.teacherId})
-        if(!routines.length){
-            return req.status(404).json({message: "No routine found for this teacher"})
-        }
-        return res.status(200).json({routines})
+        const { routineId } = req.params
+        const { status } = req.body
+
+        const updatedRoutine = await Routine.findByIdAndUpdate(routineId,{
+            status,
+            lastUpdated: new Date().toISOString().split('T')[0]
+        },
+        {new: true}
+    )
+    if(!updatedRoutine){
+        return res.status(404).json({message: "Routine Not Found."})
+    }
+    res.json(updatedRoutine)
     }catch(error){
-        return res.status(500).json({message: "Server error",error})
+        return res.status(500).json({message: "Server Error",error: error.message})
     }
 })
 
@@ -27,26 +34,47 @@ router.get('/:teacherId/:day', async (req,res)=>{
         if(!routine.length){
             return res.status(404).json({message: "No routine found for this day"})
         }
-        return res.status(200).json({routine})
+
+        const currDate = new Date().toISOString().split('T')[0]
+        const updatedRoutine = routine.map(session =>{
+            const updatedDate = session.lastUpdated? new Date(session.lastUpdated).toISOString().split('T')[0] : null
+
+            if(updatedDate !== currDate){
+                session.status = ''
+            }
+            return session
+        })
+
+        updatedRoutine.sort((a,b)=>{
+            const [aHour, aMin] = a.startTime.split(":").map(Number)
+            const [bHour, bMin] = a.startTime.split(":").map(Number)
+
+            return aHour - bHour || aMin - bMin
+        })
+        return res.status(200).json({routine : updatedRoutine})
     }catch(error){
         return res.status(500).json({message: "Server error",error})
     }
 })
 
+
 //creates routine for a specific day
 router.post('/:teacherId/:day', async (req,res)=>{
-    const {semester,section, subject} = req.body
+    const {department, semester, section, subject, startTime, endTime } = req.body
 
-    if(!semester || !section || !subject){
+    if(!department || !semester || !section || !subject || !startTime || !endTime){
         return res.status(400).json({message: "All fields are required."})
     }
     try{
         const newRoutine = new Routine({
             teacherId: req.params.teacherId,
             day: req.params.day,
+            department,
             semester,
             section,
             subject,
+            startTime,
+            endTime,
         })
         await newRoutine.save()
         return res.status(201).json({message: "Routine added successfully", routine:newRoutine})
@@ -76,7 +104,7 @@ router.patch('/:teacherId/:day', async(req,res)=>{
 //delete routine for a specific day
 router.delete('/:teacherId/:day', async (req, res)=>{
     try{
-        const deleted = await Routine.findOneAndDelete({teacherId: req.params.id, day: req.params.day})
+        const deleted = await Routine.findOneAndDelete({teacherId: req.params.teacherId, day: req.params.day})
         if(!deleted){
             return res.status(404).json({message: "Routine not found"})
         }
@@ -85,25 +113,6 @@ router.delete('/:teacherId/:day', async (req, res)=>{
         res.status(500).json({message: "server error",error})
     }
 })
-
-// Get all routines for a specific semester, section, and day
-router.get('/filter/by-class', async (req, res) => {
-    const { semester, section, day } = req.query;
-
-    if (!semester || !section || !day) {
-        return res.status(400).json({ message: "semester, section, and day are required" });
-    }
-
-    try {
-        const routines = await Routine.find({ semester, section, day });
-        if (!routines.length) {
-            return res.status(404).json({ message: "No routines found for the given class and day" });
-        }
-        return res.status(200).json({ routines });
-    } catch (error) {
-        return res.status(500).json({ message: "Server error", error });
-    }
-});
 
 
 module.exports = router

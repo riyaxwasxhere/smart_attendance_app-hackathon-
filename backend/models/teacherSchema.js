@@ -13,13 +13,9 @@ const teacherSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    role:{
-        type: String,
-        default: 'Teacher'
-    },
     assignedClasses:[
         {
-            dept: {
+            department: {
                 type: String,
                 required: true
             },

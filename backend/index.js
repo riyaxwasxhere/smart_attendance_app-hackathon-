@@ -9,9 +9,9 @@ const geofenceRoutes = require("./routes/geofenceRoutes.js");
 const attendanceRoutes = require("./routes/attendanceRoutes.js");
 const studentRoutes = require("./routes/studentRoutes.js");
 
-const routine = require("./routes/routineRoutes");
-const authRoutes = require("./routes/authRoutes");
-const profile = require("./routes/profileRoutes");
+const routine = require("./routes/routineRoutes"); //routine
+const authRoutes = require("./routes/authRoutes"); //authentication routes
+const teacherRoutes = require("./routes/teacherRoutes.js"); //teacher profiles
 
 const app = express();
 const server = http.createServer(app);
@@ -28,7 +28,7 @@ app.use("/api/attendance", attendanceRoutes);
 
 app.use("/api/routine", routine);
 app.use("/api/auth", authRoutes);
-app.use("/api/profile", profile);
+app.use("/api/teachers", teacherRoutes);
 
 mongoose
   .connect(

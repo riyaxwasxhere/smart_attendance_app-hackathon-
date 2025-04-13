@@ -9,7 +9,7 @@ const Teacher = require('../models/teacherSchema')
 
 const router = express.Router()
 
-router.post('/signUp', async (req,res)=>{
+router.post('/signUp', async(req,res)=>{
     const {name, email, password} = req.body
     try{
         const existingTeacher = await Teacher.findOne({email})
@@ -26,7 +26,7 @@ router.post('/signUp', async (req,res)=>{
         await newTeacher.save()
         return res.status(201).json({message: "Teacher registered successfully."})
     }catch(error){
-        return res.status(500).json({message: "Server Error",error})
+        return res.status(500).json({message: "Server Error",error: error.message})
     }
 })
 
