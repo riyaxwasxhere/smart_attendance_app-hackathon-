@@ -2,6 +2,27 @@ const express = require("express");
 const router = express.Router();
 const attendance = require("../models/attendanceSchema.js");
 
+// Get all attendance records
+router.get("/", async (req, res) => {
+  try {
+    const allRecords = await attendance.find({});
+    res.status(200).json(allRecords);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// Delete all attendance records
+router.delete("/", async (req, res) => {
+  try {
+    const result = await attendance.deleteMany({});
+    res.status(200).json({ message: "All attendance records deleted", deletedCount: result.deletedCount });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 // To get particular attendance of a student for today-working
 router.get("/:subject/:studentRoll/today", async (req, res) => {
