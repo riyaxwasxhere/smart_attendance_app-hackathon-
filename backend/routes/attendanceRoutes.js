@@ -148,8 +148,16 @@ router.get("/totalClasses/:dept/:className/:subject", async (req, res) => {
 // to add attendance-working
 router.post("/", async (req, res) => {
   try {
-    const { studentName, studentRoll, dept, className, subject, isPresent } =
-      req.body;
+    const {
+      studentName,
+      studentRoll,
+      dept,
+      className,
+      subject,
+      isPresent,
+      createdAt // grab createdAt from body if it exists
+    } = req.body;
+
     const attendanceData = await attendance.create({
       studentName,
       studentRoll,
@@ -157,11 +165,14 @@ router.post("/", async (req, res) => {
       className,
       subject,
       isPresent,
+      ...(createdAt && { createdAt: new Date(createdAt) }) // only include if provided
     });
+
     res.status(201).json(attendanceData);
   } catch (err) {
     res.status(500).json({ err: err.message });
   }
 });
+
 
 module.exports = router;
