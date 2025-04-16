@@ -14,6 +14,17 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Delete all students
+router.delete("/", async (req, res) => {
+  try {
+    const result = await Student.deleteMany({});
+    res.status(200).json({ message: "All students deleted", deletedCount: result.deletedCount });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 // Get students by department and class name
 router.get("/:dept/:className", async (req, res) => {
   try {
