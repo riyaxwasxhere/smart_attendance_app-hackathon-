@@ -6,6 +6,40 @@ const Session = require('../models/sessionSchema')
 
 const router = express.Router()
 
+//gets routine of students of a specific day
+router.get('/classroutine/:day', async (req,res)=>{
+    try{
+        const { department, semester, section } = req.body
+        const { day } = req.params
+        if(!department || !semester || !section){
+            return res.status(400).json({message: "All fields are required"})
+        }
+        const timeTable = await Routine.find({department,semester,section,day})
+        if(!timeTable || timeTable.length===0){
+            return res.status(404).json({message: "No routine found for this day"})
+        }
+
+        // Sort sessions based on startTime in hh:mm AM/PM format
+        timeTable.sort((a, b) => {
+            const parseTime = (timeStr) => {
+                const [time, modifier] = timeStr.split(" ");
+                let [hours, minutes] = time.split(":").map(Number);
+
+                if (modifier === "PM" && hours !== 12) hours += 12;
+                if (modifier === "AM" && hours === 12) hours = 0;
+
+                return hours * 60 + minutes; // Total minutes since midnight
+            };
+
+            return parseTime(a.startTime) - parseTime(b.startTime);
+        });
+
+        return res.status(200).json(timeTable)
+    }catch(error){
+        return res.status(500).json({message: "Server error",error: error.message})
+    }
+})
+
 // Get all sessions for a particular teacher irrespective of day
 router.get('/all/:teacherId', async (req, res) => {
     try {
