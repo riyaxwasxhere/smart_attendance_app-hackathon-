@@ -8,13 +8,7 @@ const sessionSchema = new mongoose.Schema({
     },
     day: {
         type: String,
-        enum: [
-            'Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday'
-        ],
+        enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         required: true
     },
     department: {
@@ -24,11 +18,11 @@ const sessionSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    section:{
+    section: {
         type: String,
         required: true
     },
-    subject:{
+    subject: {
         type: String,
         required: true
     },
@@ -39,13 +33,9 @@ const sessionSchema = new mongoose.Schema({
         type: String,
     },
     status: {
-        type: String,
-        enum: [
-            '',
-            'classStarted',
-            'canceled'
-        ],
-        default: ''
+        type: [String],
+        enum: ['classStarted', 'cancelled','attendanceGiven'],
+        default: []
     },
     lastUpdated: {
         type: Date,
@@ -53,7 +43,6 @@ const sessionSchema = new mongoose.Schema({
     }
 })
 
-
-const Session = mongoose.model("Session",sessionSchema)
+const Session = mongoose.model("Session", sessionSchema)
 
 module.exports = Session
