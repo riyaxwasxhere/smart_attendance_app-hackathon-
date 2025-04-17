@@ -44,6 +44,31 @@ router.patch("/:routineId", async (req,res)=>{
     }
 })
 
+// Update a specific session by sessionId
+router.patch('/session/:sessionId', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const updateFields = req.body;
+
+        const updatedSession = await Routine.findByIdAndUpdate(
+            sessionId,
+            {
+                ...updateFields,
+                lastUpdated: new Date().toISOString().split('T')[0] // update timestamp
+            },
+            { new: true }
+        );
+
+        if (!updatedSession) {
+            return res.status(404).json({ message: "Session not found" });
+        }
+
+        res.status(200).json({ message: "Session updated successfully", session: updatedSession });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
 //gets routine for a specific day
 router.get('/:teacherId/:day', async (req, res) => {
     try {
@@ -107,30 +132,7 @@ router.post('/:teacherId/:day', async (req,res)=>{
 })
 
 
-// Update a specific session by sessionId
-router.patch('/session/:sessionId', async (req, res) => {
-    try {
-        const { sessionId } = req.params;
-        const updateFields = req.body;
 
-        const updatedSession = await Routine.findByIdAndUpdate(
-            sessionId,
-            {
-                ...updateFields,
-                lastUpdated: new Date().toISOString().split('T')[0] // update timestamp
-            },
-            { new: true }
-        );
-
-        if (!updatedSession) {
-            return res.status(404).json({ message: "Session not found" });
-        }
-
-        res.status(200).json({ message: "Session updated successfully", session: updatedSession });
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-});
 
 
 //delete routine for a specific day
