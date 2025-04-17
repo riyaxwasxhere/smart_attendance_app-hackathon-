@@ -6,6 +6,23 @@ const Session = require('../models/sessionSchema')
 
 const router = express.Router()
 
+// Get all sessions for a particular teacher irrespective of day
+router.get('/all/:teacherId', async (req, res) => {
+    try {
+        const { teacherId } = req.params
+        const sessions = await Routine.find({ teacherId })
+
+        if (!sessions.length) {
+            return res.status(404).json({ message: "No sessions found for this teacher" })
+        }
+
+        res.status(200).json({ sessions })
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message })
+    }
+})
+
+
 //sets routine status by id and update lastUPdated automatically
 router.patch("/:routineId", async (req,res)=>{
     try{
