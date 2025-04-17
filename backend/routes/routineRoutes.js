@@ -45,34 +45,40 @@ router.patch("/:routineId", async (req,res)=>{
 })
 
 //gets routine for a specific day
-router.get('/:teacherId/:day', async (req,res)=>{
-    try{
-        const routine = await Routine.find({teacherId: req.params.teacherId, day: req.params.day})
-        if(!routine.length){
-            return res.status(404).json({message: "No routine found for this day"})
+router.get('/:teacherId/:day', async (req, res) => {
+    try {
+        const routine = await Routine.find({ teacherId: req.params.teacherId, day: req.params.day });
+        if (!routine.length) {
+            return res.status(404).json({ message: "No routine found for this day" });
         }
 
-        const currDate = new Date().toISOString().split('T')[0]
-        const updatedRoutine = routine.map(session =>{
-            const updatedDate = session.lastUpdated? new Date(session.lastUpdated).toISOString().split('T')[0] : null
+        const currDate = new Date().toISOString().split('T')[0];
+        const updatedRoutine = [];
 
-            if(updatedDate !== currDate){
-                session.status = ''
+        for (const session of routine) {
+            const updatedDate = session.lastUpdated ? new Date(session.lastUpdated).toISOString().split('T')[0] : null;
+
+            if (updatedDate !== currDate) {
+                session.status = [];
+                await session.save(); 
             }
-            return session
-        })
 
-        updatedRoutine.sort((a,b)=>{
-            const [aHour, aMin] = a.startTime.split(":").map(Number)
-            const [bHour, bMin] = a.startTime.split(":").map(Number)
+            updatedRoutine.push(session);
+        }
 
-            return aHour - bHour || aMin - bMin
-        })
-        return res.status(200).json({routine : updatedRoutine})
-    }catch(error){
-        return res.status(500).json({message: "Server error",error})
+        updatedRoutine.sort((a, b) => {
+            const [aHour, aMin] = a.startTime.split(":").map(Number);
+            const [bHour, bMin] = b.startTime.split(":").map(Number);
+
+            return aHour - bHour || aMin - bMin;
+        });
+
+        return res.status(200).json({ routine: updatedRoutine });
+    } catch (error) {
+        return res.status(500).json({ message: "Server error", error: error.message });
     }
-})
+});
+
 
 
 //creates routine for a specific day
