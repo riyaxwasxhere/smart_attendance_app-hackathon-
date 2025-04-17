@@ -69,7 +69,8 @@ router.patch('/session/:sessionId', async (req, res) => {
     }
 });
 
-//gets routine for a specific day
+
+// Gets routine for a specific day
 router.get('/:teacherId/:day', async (req, res) => {
     try {
         const routine = await Routine.find({ teacherId: req.params.teacherId, day: req.params.day });
@@ -85,17 +86,25 @@ router.get('/:teacherId/:day', async (req, res) => {
 
             if (updatedDate !== currDate) {
                 session.status = [];
-                await session.save(); 
+                await session.save();
             }
 
             updatedRoutine.push(session);
         }
 
+        // Sort sessions based on startTime in hh:mm AM/PM format
         updatedRoutine.sort((a, b) => {
-            const [aHour, aMin] = a.startTime.split(":").map(Number);
-            const [bHour, bMin] = b.startTime.split(":").map(Number);
+            const parseTime = (timeStr) => {
+                const [time, modifier] = timeStr.split(" ");
+                let [hours, minutes] = time.split(":").map(Number);
 
-            return aHour - bHour || aMin - bMin;
+                if (modifier === "PM" && hours !== 12) hours += 12;
+                if (modifier === "AM" && hours === 12) hours = 0;
+
+                return hours * 60 + minutes; // Total minutes since midnight
+            };
+
+            return parseTime(a.startTime) - parseTime(b.startTime);
         });
 
         return res.status(200).json({ routine: updatedRoutine });
@@ -103,6 +112,7 @@ router.get('/:teacherId/:day', async (req, res) => {
         return res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+
 
 
 
