@@ -107,22 +107,31 @@ router.post('/:teacherId/:day', async (req,res)=>{
 })
 
 
-//updates routine for a specific day
-router.patch('/:teacherId/:day', async(req,res)=>{
-    try{
-        const updated = await Routine.findOneAndUpdate(
-            {teacherId: req.params.teacherId,day : req.params.day},
-            {$set: req.body},
-            {new: true} 
-        )
-        if(!updated){
-            return res.status(404).json({message: "Routine not found"})
+// Update a specific session by sessionId
+router.patch('/session/:sessionId', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const updateFields = req.body;
+
+        const updatedSession = await Routine.findByIdAndUpdate(
+            sessionId,
+            {
+                ...updateFields,
+                lastUpdated: new Date().toISOString().split('T')[0] // update timestamp
+            },
+            { new: true }
+        );
+
+        if (!updatedSession) {
+            return res.status(404).json({ message: "Session not found" });
         }
-        return res.status(200).json({message: "Updated routine successfully!"})
-    }catch(error){
-        return res.status(500).json({message: "Server error",error})
+
+        res.status(200).json({ message: "Session updated successfully", session: updatedSession });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
     }
-})
+});
+
 
 //delete routine for a specific day
 router.delete('/:teacherId/:day', async (req, res)=>{
